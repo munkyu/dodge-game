@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>피하기 게임</title>
+    <title>Dodge Game</title>
     <style>
         * {
             touch-action: none;
@@ -200,6 +200,60 @@
                 left: 50px;
             }
         }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 2000;
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .modal-content {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 20px;
+            white-space: pre-line;
+        }
+
+        .modal-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .modal-button:hover {
+            background: #45a049;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1999;
+        }
     </style>
 </head>
 <body>
@@ -223,6 +277,15 @@
         <div class="control-button" id="rightButton">→</div>
         <div class="control-button" id="downButton">↓</div>
     </div>
+
+    <!-- 모달 창 -->
+    <div class="modal-overlay"></div>
+    <div class="modal" id="gameModal">
+        <div class="modal-title">Dodge Game</div>
+        <div class="modal-content"></div>
+        <button class="modal-button" onclick="closeModal()">확인</button>
+    </div>
+
     <script src="game.js"></script>
 </body>
 </html> 

@@ -66,6 +66,25 @@ const keys = {
     ArrowDown: false
 };
 
+// 모달 관련 함수
+function showModal(content) {
+    const modal = document.getElementById('gameModal');
+    const overlay = document.querySelector('.modal-overlay');
+    const modalContent = modal.querySelector('.modal-content');
+    
+    modalContent.textContent = content;
+    modal.style.display = 'block';
+    overlay.style.display = 'block';
+}
+
+function closeModal() {
+    const modal = document.getElementById('gameModal');
+    const overlay = document.querySelector('.modal-overlay');
+    
+    modal.style.display = 'none';
+    overlay.style.display = 'none';
+}
+
 // 키보드 이벤트 리스너
 window.addEventListener('keydown', (e) => {
     if (keys.hasOwnProperty(e.key)) {
@@ -78,12 +97,14 @@ window.addEventListener('keydown', (e) => {
         if (!gameStarted) {
             startGame();
         } else if (gameOver) {
+            closeModal();
             restartGame();
         }
     }
     
     // ESC 키로 홈으로 돌아가기 (게임 오버 상태일 때만)
     if (e.code === 'Escape' && gameOver) {
+        closeModal();
         goToHome();
     }
 });
@@ -368,7 +389,7 @@ function handleGameOver() {
     }
     message += `\n최고 기록: ${highScores[currentStage].toFixed(1)}초`;
     
-    alert(message);
+    showModal(message);
     
     // 터치 컨트롤 숨기기
     touchControls.style.display = 'none';
