@@ -16,7 +16,7 @@ HTML5 Canvas와 JavaScript로 만든 간단한 팩맨 스타일의 게임입니�
 - 모바일: 화면 하단의 방향키로 이동, 화면 터치로 시작/재시작
 
 ## 플레이 방법
-[여기를 클릭하여 게임 시작하기](https://[your-username].github.io/my-pacman/)
+[여기를 클릭하여 게임 시작하기](https://munkyu.github.io/my-pacman/)
 
 ## 기술 스택
 - HTML5 Canvas
