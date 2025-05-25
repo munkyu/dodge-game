@@ -108,8 +108,9 @@
             left: 50%;
             transform: translateX(-50%);
             display: none;
-            gap: 10px;
             z-index: 1000;
+            width: 180px;
+            height: 180px;
         }
 
         .control-button {
@@ -125,12 +126,27 @@
             color: white;
             user-select: none;
             -webkit-user-select: none;
+            position: absolute;
         }
 
-        .control-row {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
+        #upButton {
+            top: 0;
+            left: 60px;
+        }
+
+        #leftButton {
+            top: 60px;
+            left: 0;
+        }
+
+        #rightButton {
+            top: 60px;
+            right: 0;
+        }
+
+        #downButton {
+            bottom: 0;
+            left: 60px;
         }
 
         @media (max-width: 600px) {
@@ -143,9 +159,30 @@
                 padding: 12px 24px;
             }
             
+            #touchControls {
+                width: 150px;
+                height: 150px;
+            }
+            
             .control-button {
                 width: 50px;
                 height: 50px;
+            }
+            
+            #upButton {
+                left: 50px;
+            }
+            
+            #leftButton {
+                top: 50px;
+            }
+            
+            #rightButton {
+                top: 50px;
+            }
+            
+            #downButton {
+                left: 50px;
             }
         }
     </style>
@@ -167,16 +204,10 @@
         </div>
     </div>
     <div id="touchControls">
-        <div class="control-row">
-            <div class="control-button" id="upButton">↑</div>
-        </div>
-        <div class="control-row">
-            <div class="control-button" id="leftButton">←</div>
-            <div class="control-button" id="rightButton">→</div>
-        </div>
-        <div class="control-row">
-            <div class="control-button" id="downButton">↓</div>
-        </div>
+        <div class="control-button" id="upButton">↑</div>
+        <div class="control-button" id="leftButton">←</div>
+        <div class="control-button" id="rightButton">→</div>
+        <div class="control-button" id="downButton">↓</div>
     </div>
     <script src="game.js"></script>
 </body>
