@@ -475,13 +475,25 @@ function drawTimer() {
         survivalTime = ((Date.now() - startTime) / 1000).toFixed(1);
     }
     ctx.save();
-    ctx.fillStyle = 'white';
+    
+    // 텍스트 테두리 효과를 위한 함수
+    function drawTextWithOutline(text, x, y) {
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = 'black';
+        ctx.strokeText(text, x, y);
+        ctx.fillStyle = 'white';
+        ctx.fillText(text, x, y);
+    }
+    
     ctx.font = '20px Arial';
-    ctx.fillText(`생존 시간: ${survivalTime}초`, 10, 30);
+    ctx.textBaseline = 'top';
+    
+    // 생존 시간 표시
+    drawTextWithOutline(`생존 시간: ${survivalTime}초`, 10, 30);
     
     // 최고 기록 표시
     if (highScores[currentStage]) {
-        ctx.fillText(`최고 기록: ${highScores[currentStage].toFixed(1)}초`, 10, 60);
+        drawTextWithOutline(`최고 기록: ${highScores[currentStage].toFixed(1)}초`, 10, 60);
     }
     
     ctx.restore();
@@ -517,12 +529,15 @@ function draw() {
     }
     
     if (isCountingDown) {
-        // 카운트다운 표시
+        // 카운트다운 표시 (테두리 효과 추가)
         ctx.save();
-        ctx.fillStyle = 'white';
         ctx.font = 'bold 120px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = 'black';
+        ctx.strokeText(countdown.toString(), canvas.width / 2, canvas.height / 2);
+        ctx.fillStyle = 'white';
         ctx.fillText(countdown.toString(), canvas.width / 2, canvas.height / 2);
         ctx.restore();
         return;
@@ -534,9 +549,13 @@ function draw() {
     
     if (gameOver) {
         ctx.save();
-        ctx.fillStyle = 'white';
         ctx.font = '20px Arial';
         ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = 'black';
+        ctx.strokeText('스페이스 바를 눌러 다시 시작', canvas.width / 2, canvas.height / 2 + 50);
+        ctx.fillStyle = 'white';
         ctx.fillText('스페이스 바를 눌러 다시 시작', canvas.width / 2, canvas.height / 2 + 50);
         ctx.restore();
     }
