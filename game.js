@@ -353,6 +353,9 @@ function loadHighScores() {
     const savedScores = localStorage.getItem('pacmanHighScores');
     if (savedScores) {
         highScores = JSON.parse(savedScores);
+        // 스테이지별 기록이 없으면 초기화
+        if (!highScores.sojeong) highScores.sojeong = 0;
+        if (!highScores.mom) highScores.mom = 0;
     } else {
         highScores = {
             sojeong: 0,
@@ -414,6 +417,10 @@ function goToHome() {
     
     touchControls.style.display = 'none';
     stageSelect.style.display = 'block';
+    
+    // 스테이지 선택 화면 업데이트
+    updateStageSelect();
+    
     draw();
 }
 
@@ -646,12 +653,19 @@ function updateStageSelect() {
     const sojeongButton = document.querySelector('.stage-button[onclick="selectStage(\'sojeong\')"]');
     const momButton = document.querySelector('.stage-button[onclick="selectStage(\'mom\')"]');
     
+    // 최고 기록 다시 로드
+    loadHighScores();
+    
     if (highScores.sojeong > 0) {
         sojeongButton.innerHTML = `소정이 게임<br><span style="font-size: 14px">최고 기록: ${highScores.sojeong.toFixed(1)}초</span>`;
+    } else {
+        sojeongButton.innerHTML = '소정이 게임';
     }
     
     if (highScores.mom > 0) {
         momButton.innerHTML = `엄마 게임<br><span style="font-size: 14px">최고 기록: ${highScores.mom.toFixed(1)}초</span>`;
+    } else {
+        momButton.innerHTML = '엄마 게임';
     }
 }
 
