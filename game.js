@@ -1,6 +1,5 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const startButton = document.getElementById('startButton');
 const restartButton = document.getElementById('restartButton');
 const backButton = document.getElementById('backButton');
 const stageSelect = document.getElementById('stageSelect');
@@ -15,6 +14,9 @@ let gameStarted = false;
 let startTime = 0;
 let survivalTime = 0;
 let currentStage = '';
+let countdown = 0;
+let isCountingDown = false;
+let highScores = {};
 
 // 게임 캐릭터 설정
 const player = {
@@ -226,10 +228,44 @@ function distributeVillainImages() {
     }
 }
 
+// 카운트다운 시작
+function startCountdown() {
+    isCountingDown = true;
+    countdown = 3;
+    
+    // 키 입력 상태 초기화
+    resetKeys();
+    
+    // 카운트다운 동안 화면 업데이트
+    function updateCountdown() {
+        if (countdown > 0) {
+            draw(); // 현재 카운트다운 숫자와 빌런들의 위치 표시
+            countdown--;
+            setTimeout(updateCountdown, 1000);
+        } else {
+            isCountingDown = false;
+            gameStarted = true;
+            startTime = Date.now();
+            gameLoop();
+        }
+    }
+    
+    // 초기 화면 그리기 (빌런들의 초기 위치 표시)
+    draw();
+    updateCountdown();
+}
+
 // 스테이지 선택 함수
 function selectStage(stage) {
     currentStage = stage;
     stageSelect.style.display = 'none';
+    
+    // 키 입력 상태 초기화
+    resetKeys();
+    
+    // 버튼 컨테이너 숨기기
+    const buttonContainer = document.querySelector('.button-container');
+    buttonContainer.style.display = 'none';
     
     // 이미지 로드 시작
     let loadedCount = 0;
@@ -238,9 +274,8 @@ function selectStage(stage) {
     function handleLoad() {
         loadedCount++;
         if (loadedCount === requiredImages) {
-            startButton.style.display = 'block';
-            initGame();
-            draw();
+            initGame(); // 게임 초기화 (빌런 위치 설정)
+            startCountdown(); // 카운트다운 시작
         }
     }
 
@@ -254,6 +289,11 @@ function selectStage(stage) {
     
     // 빌런 이미지 로드 시도
     loadVillainImages(stage);
+
+    // 모바일인 경우 터치 컨트롤 표시
+    if (isMobile) {
+        touchControls.style.display = 'flex';
+    }
 }
 
 // 키보드 입력 초기화 함수
@@ -282,13 +322,60 @@ function initGame() {
     if (villainImages.length > 0) {
         distributeVillainImages();
     }
+
+    // 초기 화면 그리기
+    draw();
+}
+
+// 최고 기록 로드
+function loadHighScores() {
+    const savedScores = localStorage.getItem('pacmanHighScores');
+    if (savedScores) {
+        highScores = JSON.parse(savedScores);
+    } else {
+        highScores = {
+            sojeong: 0,
+            mom: 0
+        };
+        saveHighScores();
+    }
+}
+
+// 최고 기록 저장
+function saveHighScores() {
+    localStorage.setItem('pacmanHighScores', JSON.stringify(highScores));
+}
+
+// 최고 기록 업데이트
+function updateHighScore(stage, time) {
+    if (!highScores[stage] || time > highScores[stage]) {
+        highScores[stage] = time;
+        saveHighScores();
+        return true;
+    }
+    return false;
 }
 
 // 게임 오버 처리
 function handleGameOver() {
     gameOver = true;
-    const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
-    alert(`게임 오버!\n생존 시간: ${totalTime}초`);
+    const totalTime = parseFloat((Date.now() - startTime) / 1000).toFixed(1);
+    const isNewHighScore = updateHighScore(currentStage, parseFloat(totalTime));
+    
+    let message = `게임 오버!\n생존 시간: ${totalTime}초`;
+    if (isNewHighScore) {
+        message += '\n🎉 새로운 최고 기록! 🎉';
+    }
+    message += `\n최고 기록: ${highScores[currentStage].toFixed(1)}초`;
+    
+    alert(message);
+    
+    // 터치 컨트롤 숨기기
+    touchControls.style.display = 'none';
+    
+    // 버튼 컨테이너 표시
+    const buttonContainer = document.querySelector('.button-container');
+    buttonContainer.style.display = 'flex';
     restartButton.style.display = 'block';
     backButton.style.display = 'block';
 }
@@ -297,10 +384,15 @@ function handleGameOver() {
 function goToHome() {
     gameOver = false;
     gameStarted = false;
-    stageSelect.style.display = 'block';
+    
+    // 버튼 숨기기
+    const buttonContainer = document.querySelector('.button-container');
+    buttonContainer.style.display = 'none';
     restartButton.style.display = 'none';
     backButton.style.display = 'none';
+    
     touchControls.style.display = 'none';
+    stageSelect.style.display = 'block';
     draw();
 }
 
@@ -313,10 +405,6 @@ function startGame() {
     
     resetKeys();
     
-    startButton.style.display = 'none';
-    restartButton.style.display = 'none';
-    backButton.style.display = 'none';
-    
     if (isMobile) {
         touchControls.style.display = 'flex';
     }
@@ -327,11 +415,14 @@ function startGame() {
 // 게임 재시작 함수
 function restartGame() {
     gameOver = false;
-    startTime = Date.now();
     survivalTime = 0;
     
+    // 키 입력 상태 초기화
     resetKeys();
     
+    // 버튼 숨기기
+    const buttonContainer = document.querySelector('.button-container');
+    buttonContainer.style.display = 'none';
     restartButton.style.display = 'none';
     backButton.style.display = 'none';
     
@@ -340,7 +431,7 @@ function restartGame() {
     }
     
     initGame();
-    gameLoop();
+    startCountdown(); // 카운트다운 시작
 }
 
 // 충돌 감지 함수
@@ -366,6 +457,12 @@ function drawTimer() {
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial';
     ctx.fillText(`생존 시간: ${survivalTime}초`, 10, 30);
+    
+    // 최고 기록 표시
+    if (highScores[currentStage]) {
+        ctx.fillText(`최고 기록: ${highScores[currentStage].toFixed(1)}초`, 10, 60);
+    }
+    
     ctx.restore();
 }
 
@@ -373,26 +470,6 @@ function drawTimer() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(images.background, 0, 0, canvas.width, canvas.height);
-    
-    if (!gameStarted) {
-        startButton.style.display = 'block';
-        ctx.save();
-        ctx.fillStyle = 'white';
-        ctx.font = '20px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('스페이스 바를 눌러 게임 시작', canvas.width / 2, canvas.height / 2 + 50);
-        ctx.restore();
-        return;
-    }
-    
-    if (gameOver) {
-        ctx.save();
-        ctx.fillStyle = 'white';
-        ctx.font = '20px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('스페이스 바를 눌러 다시 시작', canvas.width / 2, canvas.height / 2 + 50);
-        ctx.restore();
-    }
 
     // 플레이어 그리기
     ctx.save();
@@ -417,6 +494,31 @@ function draw() {
             ctx.restore();
         });
     }
+    
+    if (isCountingDown) {
+        // 카운트다운 표시
+        ctx.save();
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 120px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(countdown.toString(), canvas.width / 2, canvas.height / 2);
+        ctx.restore();
+        return;
+    }
+    
+    if (!gameStarted) {
+        return;
+    }
+    
+    if (gameOver) {
+        ctx.save();
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('스페이스 바를 눌러 다시 시작', canvas.width / 2, canvas.height / 2 + 50);
+        ctx.restore();
+    }
 
     // 타이머 그리기
     drawTimer();
@@ -424,7 +526,7 @@ function draw() {
 
 // 게임 루프
 function gameLoop() {
-    if (!gameOver && gameStarted) {
+    if (!gameOver && gameStarted && !isCountingDown) {
         movePlayer();
         moveVillains();
         checkCollision();
@@ -434,7 +536,6 @@ function gameLoop() {
 }
 
 // 이벤트 리스너 설정
-startButton.addEventListener('click', startGame);
 restartButton.addEventListener('click', restartGame);
 backButton.addEventListener('click', goToHome);
 
@@ -500,13 +601,38 @@ function resizeCanvas() {
     canvas.style.height = `${containerWidth}px`;
 }
 
+// 스테이지 선택 화면 업데이트
+function updateStageSelect() {
+    const sojeongButton = document.querySelector('.stage-button[onclick="selectStage(\'sojeong\')"]');
+    const momButton = document.querySelector('.stage-button[onclick="selectStage(\'mom\')"]');
+    
+    if (highScores.sojeong > 0) {
+        sojeongButton.innerHTML = `소정이 게임<br><span style="font-size: 14px">최고 기록: ${highScores.sojeong.toFixed(1)}초</span>`;
+    }
+    
+    if (highScores.mom > 0) {
+        momButton.innerHTML = `엄마 게임<br><span style="font-size: 14px">최고 기록: ${highScores.mom.toFixed(1)}초</span>`;
+    }
+}
+
 // 초기화 - 스테이지 선택 화면 표시
 document.addEventListener('DOMContentLoaded', () => {
+    // 최고 기록 로드
+    loadHighScores();
+    
+    // 버튼 컨테이너 초기 숨김
+    const buttonContainer = document.querySelector('.button-container');
+    buttonContainer.style.display = 'none';
+    
     stageSelect.style.display = 'block';
-    startButton.style.display = 'none';
     restartButton.style.display = 'none';
     backButton.style.display = 'none';
     touchControls.style.display = 'none';
+    
+    // 스테이지 선택 화면 업데이트
+    updateStageSelect();
+    
+    draw();
 
     if (isMobile) {
         setupTouchControls();
@@ -515,6 +641,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // 반응형 캔버스 설정
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-    
-    draw();
 }); 

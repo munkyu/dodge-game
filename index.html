@@ -20,12 +20,13 @@
         body {
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             background: #333;
             overflow: hidden;
+            padding-top: 20px;
         }
         
         #gameContainer {
@@ -33,6 +34,23 @@
             width: 100%;
             max-width: 600px;
             margin: 0 auto;
+        }
+        
+        #stageSelect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
         }
         
         .button-container {
@@ -76,6 +94,8 @@
             margin-bottom: 20px;
             width: 80%;
             max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .stage-button {
@@ -88,12 +108,7 @@
             cursor: pointer;
             transition: background-color 0.3s;
             width: 100%;
-        }
-        
-        #stageSelect {
             text-align: center;
-            width: 100%;
-            max-width: 600px;
         }
         
         .stage-title {
@@ -191,13 +206,12 @@
     <div id="gameContainer">
         <canvas id="gameCanvas" width="600" height="600"></canvas>
         <div class="button-container">
-            <button id="startButton" class="game-button">게임 시작</button>
             <button id="restartButton" class="game-button">다시 시작</button>
             <button id="backButton" class="game-button">뒤로 가기</button>
         </div>
     </div>
     <div id="stageSelect">
-        <h1 class="stage-title">스테이지 선택</h1>
+        <h1 class="stage-title">게임 선택</h1>
         <div class="stage-select">
             <button class="stage-button" onclick="selectStage('sojeong')">소정이 게임</button>
             <button class="stage-button" onclick="selectStage('mom')">엄마 게임</button>
